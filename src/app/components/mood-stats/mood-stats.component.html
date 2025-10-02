@@ -1,0 +1,25 @@
+<div class="mood-stats">
+  <h3>Mood Statistics</h3>
+  <ng-container *ngIf="!hasMoodData()">
+    <div class="no-stats">No mood data available yet.</div>
+  </ng-container>
+  <ng-container *ngIf="hasMoodData()">
+    <div class="stats-container">
+      <div *ngFor="let stat of moodStats" class="stat-item">
+        <div class="stat-header">
+          <span class="emoji">{{ stat.emoji }}</span>
+          <span class="label">{{ stat.label }}</span>
+          <span class="percentage">{{ stat.percentage | number:'1.0-0' }}%</span>
+        </div>
+        <div class="progress-bar">
+          <div 
+            class="progress-fill" 
+            [style.width.%]="stat.percentage"
+            [ngStyle]="{'background-color': stat.color}"
+          ></div>
+        </div>
+        <div class="count">{{ stat.count }} entries</div>
+      </div>
+    </div>
+  </ng-container>
+</div>

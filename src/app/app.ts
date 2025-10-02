@@ -19,7 +19,11 @@ import { SettingsDialogComponent } from './components/settings-dialog/settings-d
   ],
   template: `
     <mat-toolbar color="primary">
-      <span>Mood Tracker 📊</span>
+      <mat-icon class="app-logo">mood</mat-icon>
+      <div class="title-group">
+        <span class="app-title">Mood Tracker 📊</span>
+        <span class="app-tagline">Track Your Daily Wellbeing</span>
+      </div>
       <span class="spacer"></span>
       <button mat-button routerLink="/dashboard" routerLinkActive="active">
         <mat-icon>dashboard</mat-icon>
@@ -39,6 +43,24 @@ import { SettingsDialogComponent } from './components/settings-dialog/settings-d
     </main>
   `,
   styles: [`
+    .title-group {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+      margin-left: 8px;
+    }
+    .app-title {
+      font-size: 1.2em;
+      font-weight: 500;
+    }
+    .app-tagline {
+      font-size: 0.7em;
+      opacity: 0.8;
+    }
+    .app-logo {
+      margin-right: 4px;
+      vertical-align: middle;
+    }
     .spacer {
       flex: 1 1 auto;
     }
@@ -48,15 +70,6 @@ import { SettingsDialogComponent } from './components/settings-dialog/settings-d
       max-width: 1200px;
       margin: 0 auto;
       min-height: calc(100vh - 64px);
-      background-color: #f5f5f5;
-    }
-    
-    button {
-      margin-right: 8px;
-    }
-    
-    button.active {
-      background-color: rgba(255, 255, 255, 0.1);
     }
   `]
 })

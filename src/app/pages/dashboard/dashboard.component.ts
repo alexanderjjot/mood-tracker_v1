@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, signal, inject } from '@angular/cor
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MoodEntryComponent } from '../../components/mood-entry/mood-entry.component';
 import { MoodStatsComponent } from '../../components/mood-stats/mood-stats.component';
-import { MoodChartComponent } from '../../components/mood-chart/mood-chart.component';
 import { Mood } from '../../models/mood.interface';
 import { MoodService } from '../../services/mood.service';
 import { CommonModule } from '@angular/common';
@@ -14,44 +13,96 @@ import { CommonModule } from '@angular/common';
     CommonModule,
     MatSnackBarModule,
     MoodEntryComponent,
-    MoodStatsComponent,
-    MoodChartComponent
+    MoodStatsComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="dashboard">
-      <div class="row">
-        <div class="col-12 col-md-6">
+      <div class="dashboard-content">
+        <div class="left-panel">
           <app-mood-entry (moodSubmit)="onMoodSubmit($event)"></app-mood-entry>
         </div>
-        <div class="col-12 col-md-6">
-          <app-mood-stats [moods]="recentMoods()" />
-          <app-mood-chart [moods]="recentMoods()" />
+        <div class="right-panel">
+          <app-mood-stats [moods]="recentMoods()"></app-mood-stats>
         </div>
       </div>
     </div>
   `,
   styles: [`
+    :host {
+      display: block;
+      width: 100%;
+      min-height: 100vh;
+      background: #f5f5f5;
+    }
+
     .dashboard {
-      padding: 1rem;
+      padding: 1.5rem;
       width: 100%;
-      height: 100%;
-    }
-
-    .row {
+      min-height: 100vh;
+      box-sizing: border-box;
       display: flex;
-      flex-wrap: wrap;
-      margin: 0 -0.5rem;
+      justify-content: center;
     }
 
-    .col-12 {
+    .dashboard-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
       width: 100%;
-      padding: 0.5rem;
+      max-width: 1200px;
+      margin: 0;
+    }
+
+    .left-panel {
+      width: 100%;
+    }
+
+    .right-panel {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Make sure mat-card takes full width */
+    ::ng-deep .mat-mdc-card {
+      width: 100%;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Ensure proper spacing between chart items */
+    ::ng-deep .stat-item {
+      margin-bottom: 1rem;
     }
 
     @media (min-width: 768px) {
-      .col-md-6 {
-        width: 50%;
+      .dashboard {
+        padding: 2rem;
+      }
+
+      .dashboard-content {
+        flex-direction: row;
+        gap: 2rem;
+      }
+
+      .left-panel {
+        flex: 0 0 400px;
+        position: sticky;
+        top: 2rem;
+        height: fit-content;
+      }
+
+      .right-panel {
+        flex: 1;
+        min-width: 0;
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .dashboard-content {
+        gap: 3rem;
       }
     }
   `]
@@ -67,7 +118,10 @@ export class DashboardComponent {
   }
 
   protected onMoodSubmit(moodData: Omit<Mood, 'id' | 'timestamp'>): void {
+    console.log('Submitting mood data:', moodData);
     this.moodService.addEntry(moodData);
+    // Refresh the recent moods to include the new entry
+    this.loadRecentMoods();
     this.snackBar.open('Mood saved successfully!', 'Close', {
       duration: 3000,
       horizontalPosition: 'right',
@@ -78,9 +132,11 @@ export class DashboardComponent {
   private loadRecentMoods(): void {
     try {
       const moods = this.moodService.getMoods();
+      console.log('Loaded moods from service:', moods);
       const sortedMoods = [...moods]
         .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
         .slice(0, 7);
+      console.log('Sorted and limited moods:', sortedMoods);
       this.recentMoods.set(sortedMoods);
     } catch (error) {
       console.error('Error loading recent moods:', error);

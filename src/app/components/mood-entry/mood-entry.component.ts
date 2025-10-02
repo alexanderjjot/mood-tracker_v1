@@ -22,137 +22,19 @@ import { CommonModule } from '@angular/common';
     MatTooltipModule,
     MatIconModule
   ],
-  template: `
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>How are you feeling today?</mat-card-title>
-      </mat-card-header>
-
-      <mat-card-content>
-        <form [formGroup]="moodForm" (ngSubmit)="onSubmit()">
-          <div class="mood-buttons">
-            @for (level of moodLevels; track level) {
-              <button
-                type="button"
-                mat-fab
-                [color]="moodForm.get('moodLevel')?.value === level ? 'primary' : 'accent'"
-                [class]="'mood-button mood-level-' + level"
-                (click)="selectMoodLevel(level)"
-                [matTooltip]="getMoodLabel(level)"
-                matTooltipPosition="above"
-              >
-                <span class="mood-emoji">{{ getMoodEmoji(level) }}</span>
-              </button>
-            }
-          </div>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Notes (optional)</mat-label>
-            <textarea
-              matInput
-              formControlName="notes"
-              placeholder="Add any notes about your mood..."
-              rows="3"
-            ></textarea>
-          </mat-form-field>
-
-          <div class="actions">
-            <button
-              mat-raised-button
-              color="primary"
-              type="submit"
-              [disabled]="!moodForm.get('moodLevel')?.value"
-            >
-              Save Mood
-            </button>
-          </div>
-        </form>
-      </mat-card-content>
-    </mat-card>
-  `,
-  styles: [`
-    .mood-buttons {
-      display: flex;
-      justify-content: space-around;
-      margin: 1.5rem 0;
-    }
-
-    .mood-button {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .mood-emoji {
-      font-size: 2rem;
-      line-height: 1;
-      z-index: 2;
-      position: relative;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    }
-
-    .mood-buttons button:hover {
-      transform: scale(1.1);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-
-    .mood-buttons button[color="primary"] {
-      transform: scale(1.1);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-
-    /* Mood level background colors */
-    .mood-level-1 {
-      background-color: #e74c3c !important;
-      color: white !important;
-    }
-    .mood-level-2 {
-      background-color: #e67e22 !important;
-      color: white !important;
-    }
-    .mood-level-3 {
-      background-color: #f1c40f !important;
-      color: #333 !important;
-    }
-    .mood-level-4 {
-      background-color: #2ecc71 !important;
-      color: white !important;
-    }
-    .mood-level-5 {
-      background-color: #27ae60 !important;
-      color: white !important;
-    }
-
-    .full-width {
-      width: 100%;
-      margin: 1rem 0;
-    }
-
-    .actions {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 1rem;
-    }
-
-    .actions button {
-    }
-  `],
+  templateUrl: './mood-entry.component.html',
+  styleUrls: ['./mood-entry.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MoodEntryComponent {
   protected readonly moodSubmit = output<Omit<Mood, 'id' | 'timestamp'>>();
-
-  protected readonly moodForm: FormGroup;
   protected readonly moodLevels = [1, 2, 3, 4, 5];
+  
+  protected readonly moodForm: FormGroup;
 
   constructor(private fb: FormBuilder) {
     this.moodForm = this.fb.group({
-      moodLevel: [null],
+      moodLevel: [null, Validators.required],
       notes: ['']
     });
   }
@@ -181,5 +63,10 @@ export class MoodEntryComponent {
   getMoodLabel(level: number): string {
     const labels = ['Very Bad', 'Bad', 'Neutral', 'Good', 'Very Good'];
     return labels[level - 1] || '';
+  }
+  
+  getMoodColor(level: number): string {
+    const colors = ['#ef4444', '#f97316', '#facc15', '#4ade80', '#22c55e'];
+    return colors[level - 1] || '#e5e7eb';
   }
 }

@@ -1,0 +1,37 @@
+<div class="mood-entry">
+  <h3>How are you feeling today?</h3>
+  
+  <form [formGroup]="moodForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label>Select your mood</label>
+      <div class="mood-buttons">
+        @for (level of moodLevels; track level) {
+          <button
+            type="button"
+            class="mood-button"
+            [class.selected]="moodForm.get('moodLevel')?.value === level"
+            (click)="selectMoodLevel(level)"
+            [style.background]="getMoodColor(level)"
+          >
+            <span class="emoji">{{ getMoodEmoji(level) }}</span>
+            <span class="mood-label">{{ getMoodLabel(level) }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="notes">Notes (optional)</label>
+      <textarea
+        id="notes"
+        formControlName="notes"
+        placeholder="Add any notes about your mood..."
+        rows="3"
+      ></textarea>
+    </div>
+
+    <button type="submit" [disabled]="!moodForm.valid">
+      Save Mood
+    </button>
+  </form>
+</div>
